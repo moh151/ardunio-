@@ -1,4 +1,7 @@
-//code copied from arduino.cc 
+const int trigPin = 9;
+const int echoPin = 8;
+long duration;
+int distance;
 int pulsePin = A0;                 // Pulse Sensor purple wire connected to analog pin A0
 int blinkPin = 13;                // pin to blink led at each beat
 
@@ -23,6 +26,8 @@ volatile boolean secondBeat = false;      // used to seed rate array so we start
 
 void setup()
 {
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  pinMode(echoPin, INPUT); // Sets the echoPin as an Input
   pinMode(blinkPin,OUTPUT);         // pin that will blink to your heartbeat!
   Serial.begin(9600);               // we agree to talk fast!
   interruptSetup();                 // sets up to read Pulse Sensor signal every 2mS 
@@ -45,7 +50,23 @@ void loop()
       QS = false; // reset the Quantified Self flag for next time    
     }
      
-  delay(20); //  take a break
+  delay(2); //  take a break\
+ 
+  // Clears the trigPin
+digitalWrite(trigPin, LOW);
+delayMicroseconds(2);
+// Sets the trigPin on HIGH state for 10 micro seconds
+digitalWrite(trigPin, HIGH);
+delayMicroseconds(10);
+digitalWrite(trigPin, LOW);
+// Reads the echoPin, returns the sound wave travel time in microseconds
+duration = pulseIn(echoPin, HIGH);
+// Calculating the distance
+distance= duration*0.034/2;
+// Prints the distance on the Serial Monitor
+Serial.print("Distance: ");
+Serial.println(distance);
+delay(1000);
 }
 
 
@@ -79,11 +100,6 @@ void serialOutputWhenBeatHappens()
      Serial.print("BPM: ");
      Serial.println(BPM);
    }
- else
-   {
-     sendDataToSerial('B',BPM);   // send heart rate with a 'B' prefix
-     sendDataToSerial('Q',IBI);   // send time between beats with a 'Q' prefix
-   }   
 }
 
 void arduinoSerialMonitorVisual(char symbol, int data )
