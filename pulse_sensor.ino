@@ -1,3 +1,6 @@
+#include <SPI.h>
+#include <SD.h>
+
 const int trigPin = 9;
 const int echoPin = 8;
 long duration;
@@ -30,6 +33,11 @@ void setup()
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
   pinMode(blinkPin,OUTPUT);         // pin that will blink to your heartbeat!
   Serial.begin(9600);               // we agree to talk fast!
+ if (!SD.begin(10)) {
+Serial.println("initialization failed!");
+while (1);
+}
+Serial.println("initialization done."); 
   interruptSetup();                 // sets up to read Pulse Sensor signal every 2mS 
                                     // IF YOU ARE POWERING The Pulse Sensor AT VOLTAGE LESS THAN THE BOARD VOLTAGE, 
                                     // UN-COMMENT THE NEXT LINE AND APPLY THAT VOLTAGE TO THE A-REF PIN
@@ -67,6 +75,26 @@ distance= duration*0.034/2;
 Serial.print("Distance: ");
 Serial.println(distance);
 delay(1000);
+{
+File myFile;
+myFile = SD.open("Ultra4.txt", FILE_WRITE);
+myFile.print("Distance: "); 
+myFile.println(distance);
+myFile.close();
+}
+{
+  File myFilee;
+myFilee = SD.open("Pulse.txt", FILE_WRITE);
+myFilee.print(" Heart-Beat Found ");  //ASCII Art Madness
+myFilee.print("BPM: ");
+myFilee.println(BPM);
+myFilee.close();
+  
+  
+  
+  }
+
+
 }
 
 
